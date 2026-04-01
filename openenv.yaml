@@ -1,0 +1,12 @@
+name: smart-delivery-env
+description: Real-world RL environment for last-mile delivery optimization
+
+entrypoint: env.environment:SmartDeliveryEnv
+
+tasks:
+  - name: easy
+    grader: env.tasks:task_easy
+  - name: medium
+    grader: env.tasks:task_medium
+  - name: hard
+    grader: env.tasks:task_hard
