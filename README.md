@@ -20,3 +20,5 @@ This environment models real-world logistics problems such as:
 
 ```bash
 python smart_delivery_env.py
+
+## 📊 Sample Output
