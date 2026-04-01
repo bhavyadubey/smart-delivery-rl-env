@@ -1,2 +1,22 @@
-# smart-delivery-rl-env
-Smart Delivery RL Environment is a real-world reinforcement learning simulation for last-mile logistics optimization. It models dynamic demand, stochastic traffic, and priority-based decisions using a standard RL API (reset/step/state). Designed for training intelligent agents and showcasing practical AI in operations.
+# Smart Delivery RL Environment
+
+A real-world inspired reinforcement learning environment simulating last-mile delivery optimization with dynamic demand, stochastic delays, and priority-based decision making.
+
+## Features
+- Custom RL environment with `reset()`, `step()`, `state()` API
+- Dynamic order generation (real-time simulation)
+- Stochastic traffic delays
+- Priority-based delivery system
+- Reward shaping for intelligent decision-making
+- Greedy baseline agent for demonstration
+
+## Use Case
+This environment models real-world logistics problems such as:
+- Last-mile delivery optimization
+- Fleet routing under uncertainty
+- Time-sensitive task scheduling
+
+##  Run the Simulation
+
+```bash
+python smart_delivery_env.py
