@@ -24,7 +24,7 @@ This environment models real-world logistics problems such as:
 python smart_delivery_env.py
 
 ```
-## 📊 Sample Output
+## Sample Output
 
 Step: 1 | Action: 2 | Reward: 18.4 | Time: 3.2 | Pending: 4
 Step: 2 | Action: 1 | Reward: 12.7 | Time: 6.5 | Pending: 3
