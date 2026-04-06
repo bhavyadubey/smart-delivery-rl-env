@@ -4,6 +4,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --no-cache-dir numpy pydantic
+RUN pip install --no-cache-dir numpy pydantic fastapi uvicorn
 
-CMD ["python", "baseline/run_baseline.py"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
