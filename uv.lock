@@ -1,0 +1,6 @@
+# uv lock file for OpenEnv validation
+version = 1
+
+[[package]]
+name = "smart-delivery-openenv"
+version = "0.1.0"
