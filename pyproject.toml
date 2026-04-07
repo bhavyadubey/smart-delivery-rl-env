@@ -1,0 +1,17 @@
+[project]
+name = "smart-delivery-openenv"
+version = "0.1.0"
+description = "OpenEnv RL environment for last-mile delivery optimization"
+authors = [
+    { name = "Bhavya Dubey" }
+]
+dependencies = [
+    "numpy",
+    "pydantic",
+    "fastapi",
+    "uvicorn"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
