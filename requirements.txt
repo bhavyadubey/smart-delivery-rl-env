@@ -2,3 +2,4 @@ numpy
 pydantic
 fastapi
 uvicorn
+openai
