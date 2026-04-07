@@ -3,12 +3,6 @@ from openai import OpenAI
 from env.environment import SmartDeliveryEnv
 from env.models import Action
 
-# MUST use these
-client = OpenAI(
-    base_url=os.environ["API_BASE_URL"],
-    api_key=os.environ["API_KEY"]
-)
-
 def run_episode():
     env = SmartDeliveryEnv()
     obs = env.reset()
@@ -17,32 +11,37 @@ def run_episode():
 
     total_reward = 0
 
+    # Safely get env vars
+    base_url = os.environ.get("API_BASE_URL")
+    api_key = os.environ.get("API_KEY")
+    model = os.environ.get("MODEL_NAME", "gpt-4o-mini")
+
+    client = None
+    if base_url and api_key:
+        client = OpenAI(base_url=base_url, api_key=api_key)
+
     for step in range(5):
-        # Prepare prompt for LLM
-        prompt = f"""
-        You are a delivery optimization agent.
-        Current state:
-        Agent at ({obs.agent_x}, {obs.agent_y})
-        Deliveries: {[ (d.id, d.x, d.y, d.priority, d.done) for d in obs.deliveries ]}
+        if client:
+            # LLM call (ONLY in hackathon environment)
+            prompt = f"""
+            Agent at ({obs.agent_x}, {obs.agent_y})
+            Deliveries: {[ (d.id, d.priority, d.done) for d in obs.deliveries ]}
+            Return best delivery_id.
+            """
 
-        Choose the next delivery_id to maximize reward.
-        Return ONLY the delivery_id as an integer.
-        """
+            response = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0
+            )
 
-        # REQUIRED API CALL
-        response = client.chat.completions.create(
-            model=os.environ["MODEL_NAME"],
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0
-        )
-
-        # Extract action
-        try:
-            action_id = int(response.choices[0].message.content.strip())
-        except:
-            action_id = 0  # fallback
+            try:
+                action_id = int(response.choices[0].message.content.strip())
+            except:
+                action_id = 0
+        else:
+            # fallback for HF / local
+            action_id = step % len(obs.deliveries)
 
         action = Action(delivery_id=action_id)
 
