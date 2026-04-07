@@ -1,39 +1,66 @@
 import os
+from openai import OpenAI
 from env.environment import SmartDeliveryEnv
 from env.models import Action
 
-print("[START]")
+# MUST use these
+client = OpenAI(
+    base_url=os.environ["API_BASE_URL"],
+    api_key=os.environ["API_KEY"]
+)
 
-# Required environment variables
-API_BASE_URL = os.getenv("API_BASE_URL", "dummy")
-MODEL_NAME = os.getenv("MODEL_NAME", "dummy")
-HF_TOKEN = os.getenv("HF_TOKEN", "dummy")
+def run_episode():
+    env = SmartDeliveryEnv()
+    obs = env.reset()
 
-env = SmartDeliveryEnv()
-obs = env.reset()
+    print("[START]", flush=True)
 
-done = False
-step_id = 0
-total_reward = 0
+    total_reward = 0
 
-while not done:
-    best = None
-    best_score = -1
+    for step in range(5):
+        # Prepare prompt for LLM
+        prompt = f"""
+        You are a delivery optimization agent.
+        Current state:
+        Agent at ({obs.agent_x}, {obs.agent_y})
+        Deliveries: {[ (d.id, d.x, d.y, d.priority, d.done) for d in obs.deliveries ]}
 
-    for d in obs.deliveries:
-        if not d.done:
-            dist = ((obs.agent_x - d.x)**2 + (obs.agent_y - d.y)**2)**0.5
-            score = d.priority / (dist + 1e-5)
-            if score > best_score:
-                best_score = score
-                best = d
+        Choose the next delivery_id to maximize reward.
+        Return ONLY the delivery_id as an integer.
+        """
 
-    action = Action(delivery_id=best.id)
+        # REQUIRED API CALL
+        response = client.chat.completions.create(
+            model=os.environ["MODEL_NAME"],
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0
+        )
 
-    obs, reward, done, _ = env.step(action)
-    total_reward += reward.value
+        # Extract action
+        try:
+            action_id = int(response.choices[0].message.content.strip())
+        except:
+            action_id = 0  # fallback
 
-    print(f"[STEP] step={step_id} reward={reward.value}")
-    step_id += 1
+        action = Action(delivery_id=action_id)
 
-print(f"[END] total_reward={total_reward}")
+        print(f"[STEP] action={action.delivery_id}", flush=True)
+
+        obs, reward, done, _ = env.step(action)
+
+        print(f"[STEP] reward={reward.value}", flush=True)
+
+        total_reward += reward.value
+
+        if done:
+            break
+
+    score = max(0.0, min(1.0, (total_reward + 100) / 200))
+
+    print(f"[END] score={score}", flush=True)
+
+
+if __name__ == "__main__":
+    run_episode()
