@@ -9,8 +9,12 @@ dependencies = [
     "numpy",
     "pydantic",
     "fastapi",
-    "uvicorn"
+    "uvicorn",
+    "openenv-core>=0.2.0"
 ]
+
+[project.scripts]
+server = "server.app:app"
 
 [build-system]
 requires = ["setuptools>=61.0"]
